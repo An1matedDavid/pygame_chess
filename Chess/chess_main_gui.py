@@ -4,6 +4,8 @@ gui user input and displaying current GameState object
 
 import pygame as p
 from Chess.chess_engine import GameState
+from Chess.chess_engine import Move
+import datetime
 
 WIDTH = 512
 HEIGHT = 512
@@ -44,6 +46,20 @@ def main():
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
+                st = str(datetime.datetime.now()).split('.')[0].replace(" ", "_").replace(":", "-")
+                f = open("game_history/my_game_" + st + ".txt", "w")
+                game_in_notation = [ ]
+                for hist_move in gs.move_log:
+                    hist_pretty = {
+                        "piece_moved": hist_move.piece_moved,
+                        "chess note:": hist_move.get_chess_notation(),
+                        "piece_captured": hist_move.piece_captured
+                    }
+                    hist_pretty = str(hist_pretty) + '\n'
+                    game_in_notation.append(hist_pretty)
+                for pretty_hist_move in game_in_notation:
+                    f.write(str(pretty_hist_move))
+                f.close()
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()  # (x,y) location of mouse
@@ -56,7 +72,11 @@ def main():
                     square_selected = (row, col)
                     player_clicks.append(square_selected)  # append for both 1st and 2nd click
                 if len(player_clicks) == 2:  # after 2nd click, move the piece.
-                    player_clicks = []
+                    move = Move(player_clicks[0], player_clicks[1], gs.board)
+                    print(move.get_chess_notation())
+                    gs.make_move(move)
+                    square_selected = ()  # reset
+                    player_clicks = []  # reset
 
         draw_game_state(screen, gs)
         clock.tick(MAX_FPS)
@@ -102,6 +122,7 @@ def draw_simpler_demo():
             print("even_odd:", even_odd)
             print("color:", colors[even_odd])
 
+
 def draw_pieces(screen, board):
     """draw pieces using current GameState.board"""
     for row in range(DIMENSION):
@@ -109,6 +130,7 @@ def draw_pieces(screen, board):
             piece = board[row][column]
             if piece != "--":  # not an empty square
                 screen.blit(IMAGES[piece], p.Rect(column*SQ_SIZE, row*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
 
 def draw_game_state(screen, gs):
     """
