@@ -27,18 +27,36 @@ class GameState:
         self.move_log = []
 
     def make_move(self, move):
-        """ advance the board state to post-move state."""
+        """ advance the board state to post-move state.
+        will not work for castling, en-passant, or pawn promotion."""
         self.board[move.start_row][move.start_col] = "--"
         self.board[move.end_row][move.end_col] = move.piece_moved
         self.move_log.append(move)  # log the move
-        self.white_to_move = not self.white_to_move  # clever way to swap
+        self.white_to_move = not self.white_to_move  # clever way to swap player turn
 
+    def undo_move(self):
+        if self.move_log:
+            move = self.move_log.pop()
+            self.board[move.start_row][move.start_col] = move.piece_moved
+            self.board[move.end_row][move.end_col] = move.piece_captured
+            self.white_to_move = not self.white_to_move  # clever way to swap player turn
 
-class Move():
+    def get_all_valid_moves(self):
+        """All moves considering checks"""
+        self.get_all_possible_moves()  # for now we will not worry about checks
+
+    def get_all_possible_moves(self):
+        """All moves without considering checks"""
+        moves = []
+        for row in range(len(self.board)):  # number of rows
+            for column in range(len(self.board[row])):  # number of columns
+                pass
+
+class Move:
     """Class to store and tack moves in a game."""
 
     """
-    Rank File Notation in chess. The chessboard is divided into ranks (numbers) and files (letters).
+    "Rank File" Notation in chess. The chessboard is divided into ranks (numbers) and files (letters).
     This is used as an identifier for when the players move their chess pieces.
     
     8

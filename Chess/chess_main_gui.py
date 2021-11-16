@@ -5,7 +5,7 @@ gui user input and displaying current GameState object
 import pygame as p
 from Chess.chess_engine import GameState
 from Chess.chess_engine import Move
-import datetime
+from Chess.save_data import save_to_txt_file
 
 WIDTH = 512
 HEIGHT = 512
@@ -46,21 +46,10 @@ def main():
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
-                st = str(datetime.datetime.now()).split('.')[0].replace(" ", "_").replace(":", "-")
-                f = open("game_history/my_game_" + st + ".txt", "w")
-                game_in_notation = [ ]
-                for hist_move in gs.move_log:
-                    hist_pretty = {
-                        "piece_moved": hist_move.piece_moved,
-                        "chess note:": hist_move.get_chess_notation(),
-                        "piece_captured": hist_move.piece_captured
-                    }
-                    hist_pretty = str(hist_pretty) + '\n'
-                    game_in_notation.append(hist_pretty)
-                for pretty_hist_move in game_in_notation:
-                    f.write(str(pretty_hist_move))
-                f.close()
+                # save game to txt file on exit. todo
+                save_to_txt_file(gs)
                 running = False
+            # mouse press handler
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()  # (x,y) location of mouse
                 col = location[0]//SQ_SIZE
@@ -77,6 +66,10 @@ def main():
                     gs.make_move(move)
                     square_selected = ()  # reset
                     player_clicks = []  # reset
+            # key press handler
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:  # undo when 'z' is pressed
+                    gs.undo_move()
 
         draw_game_state(screen, gs)
         clock.tick(MAX_FPS)
