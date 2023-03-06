@@ -6,4 +6,4 @@ ideas for game creation. Then, once working, re-factor (possibly re-design), and
 add features.
 
 The game should be in a state that allows for complicated AI's which are able
-to leverage AI in decision-making. 
+to leverage ML in decision-making. The intention is an exercise for the developer, not a globally optimal chess AI.
